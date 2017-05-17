@@ -13,8 +13,10 @@ import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiC;
+import org.appcelerator.kroll.common.AsyncResult;
 import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiConfig;
+import org.appcelerator.kroll.common.TiMessenger;
 import org.appcelerator.titanium.util.TiConvert;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.view.TiCompositeLayout;
@@ -27,15 +29,22 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Message;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 
 // This proxy can be created by calling Compassview.createExample({message: "hello world"})
-@Kroll.proxy(creatableInModule = CompassviewModule.class)
+@Kroll.proxy(creatableInModule = CompassviewModule.class, propertyAccessors = {
+		CompassviewModule.PROP_OFFSET, CompassviewModule.PROP_BEARING })
 public class CompassViewProxy extends TiViewProxy implements
 		SensorEventListener {
-	// Standard Debugging variables
+
 	TiUIView view;
+	private static final int MSG_FIRST_ID = TiViewProxy.MSG_LAST_ID + 1;
+	private static final int MSG_START = MSG_FIRST_ID + 500;
+	private static final int MSG_STOP = MSG_FIRST_ID + 501;
+	private static final int MSG_GET_BEARING = MSG_FIRST_ID + 502;
+	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 503;
 	private float currentDegree = 0f;
 
 	private static final String LCAT = "ExampleProxy";
@@ -44,6 +53,8 @@ public class CompassViewProxy extends TiViewProxy implements
 	private static SensorManager sensorManager = (SensorManager) ctx
 			.getSystemService(ctx.SENSOR_SERVICE);
 	private static final boolean DBG = TiConfig.LOGD;
+	private float offset = 0;
+	private boolean running = false;
 
 	private class CompassView extends TiUIView {
 
@@ -74,6 +85,105 @@ public class CompassViewProxy extends TiViewProxy implements
 		super();
 	}
 
+	// Message handling
+	@Override
+	public boolean handleMessage(Message msg) {
+		AsyncResult result = null;
+		switch (msg.what) {
+		case MSG_SET_OFFSET: {
+			result = (AsyncResult) msg.obj;
+			handleSetOffset((Float) result.getArg());
+			result.setResult(null);
+			return true;
+		}
+		case MSG_GET_BEARING: {
+			result = (AsyncResult) msg.obj;
+			result.setResult(handleGetBearing());
+			return true;
+		}
+
+		case MSG_START: {
+			result = (AsyncResult) msg.obj;
+			handleStart();
+			return true;
+		}
+		case MSG_STOP: {
+			result = (AsyncResult) msg.obj;
+			handleStop();
+			return true;
+		}
+		default: {
+			return super.handleMessage(msg);
+		}
+		}
+	}
+
+	@Kroll.method
+	public void start() {
+		if (TiApplication.isUIThread()) {
+			handleStart();
+		} else {
+			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(
+					MSG_START));
+
+		}
+	}
+
+	private void handleStart() {
+		running = true;
+		sensorManager.registerListener(this,
+				sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+				SensorManager.SENSOR_DELAY_GAME);
+	}
+
+	@Kroll.method
+	public void stop() {
+		if (TiApplication.isUIThread()) {
+			handleStart();
+		} else {
+			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(
+					MSG_STOP));
+
+		}
+	}
+
+	private void handleStop() {
+		running = false;
+		sensorManager.unregisterListener(this);
+	}
+
+	@Kroll.method
+	@Kroll.setProperty
+	public void setOffset(float offset) {
+		if (TiApplication.isUIThread()) {
+			handleSetOffset(offset);
+		} else {
+			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(
+					MSG_SET_OFFSET, offset));
+
+		}
+	}
+
+	private void handleSetOffset(float offset) {
+
+	}
+
+	@Kroll.method
+	@Kroll.getProperty
+	public float getBearing() {
+		if (TiApplication.isUIThread()) {
+			return handleGetBearing();
+		} else {
+			return (Float) TiMessenger.sendBlockingMainMessage(getMainHandler()
+					.obtainMessage(MSG_SET_OFFSET));
+
+		}
+	}
+
+	private float handleGetBearing() {
+		return 0;
+	}
+
 	@Override
 	public TiUIView createView(Activity activity) {
 		view = new CompassView(this);
@@ -92,29 +202,9 @@ public class CompassViewProxy extends TiViewProxy implements
 					"example created with message: "
 							+ opts.get(TiC.PROPERTY_IMAGE));
 		}
-		if (opts.containsKey("offset")) {
-			Log.d(LCAT,
-					"example created with message: " + opts.getInt("offset"));
+		if (opts.containsKey(CompassviewModule.PROP_OFFSET)) {
+			offset = opts.getInt(CompassviewModule.PROP_OFFSET);
 		}
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public void onResume(Activity a) {
-		super.onResume(a);
-		sensorManager.registerListener(this,
-				sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
-				SensorManager.SENSOR_DELAY_GAME);
-	}
-
-	@Override
-	public void onPause(Activity a) {
-		super.onPause(a);
-
-		// to stop the listener and save battery
-
-		sensorManager.unregisterListener(this);
-
 	}
 
 	@Override

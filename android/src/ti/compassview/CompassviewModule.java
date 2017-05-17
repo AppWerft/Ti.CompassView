@@ -19,8 +19,9 @@ import org.appcelerator.kroll.common.TiConfig;
 public class CompassviewModule extends KrollModule {
 
 	// Standard Debugging variables
-	private static final String LCAT = "";
-	private static final boolean DBG = TiConfig.LOGD;
+	public static final String LCAT = "TiCompass";
+	public static final String PROP_BEARING = "bearing";
+	public static final String PROP_OFFSET = "offset";
 
 	// You can define constants with @Kroll.constant, for example:
 	// @Kroll.constant public static final String EXTERNAL_NAME = value;

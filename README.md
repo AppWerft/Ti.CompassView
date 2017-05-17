@@ -1,6 +1,6 @@
 # Ti.CompassView
 
-This Titanium module realizes a compassview. This works faster then a pure JS solution, because the event managing over KrollProxy is avoided.
+This Titanium module realizes a compassview. This works faster and smother then a pure JS solution, because the event managing over KrollProxy is avoided.
  
  ## Usage
  
@@ -9,6 +9,8 @@ This Titanium module realizes a compassview. This works faster then a pure JS so
  	offset : 0
  });
  view.add(Ti.UI.createImageView({}));
- view.start();
  view.getBearing();
- ```
+ view.setOffset(32);
+ window.addEventListener("focus",function(){view.start();});
+ window.addEventListener("blur",function(){view.stop();});
+  ```

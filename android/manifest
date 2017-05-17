@@ -15,4 +15,4 @@ name: compassview
 moduleid: ti.compassview
 guid: 3211c2b1-1d54-475f-805f-ac6cbb93af72
 platform: android
-minsdk: 6.0.3.GA
+minsdk: 6.0.0.GA
