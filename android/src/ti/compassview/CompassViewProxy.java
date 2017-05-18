@@ -34,7 +34,10 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Message;
+import android.view.Display;
+import android.view.Surface;
 import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,6 +56,7 @@ public class CompassViewProxy extends TiViewProxy implements
 	private static final int MSG_GET_BEARING = MSG_FIRST_ID + 502;
 	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 503;
 	private float currentAzimut = 0f;
+	private int currentDeviceOrientation = 0;
 	private int duration = 200;
 	private String URL_REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
 
@@ -244,14 +248,25 @@ public class CompassViewProxy extends TiViewProxy implements
 	// http://stackoverflow.com/questions/15155985/android-compass-bearing
 	@Override
 	public void onSensorChanged(SensorEvent event) {
+		final float PIVOT = 0.5f;
 		float azimut = Math.round(event.values[0]);
-		RotateAnimation ra = new RotateAnimation(currentAzimut, -azimut,
-				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-				0.5f);
-		ra.setDuration(duration);
-		ra.setFillAfter(true);
+		Display display = TiApplication.getAppRootOrCurrentActivity()
+				.getWindowManager().getDefaultDisplay();
+		int deviceRot = display.getRotation();
+		int compassrot = 0;
+		if (currentDeviceOrientation != deviceRot) {
+			Log.d(LCAT, "deviceRot=" + deviceRot);
+			currentDeviceOrientation = deviceRot;
+		}
+		azimut += deviceRot * 90;
+		RotateAnimation rotAnimation = new RotateAnimation(currentAzimut,
+				-azimut, Animation.RELATIVE_TO_SELF, PIVOT,
+				Animation.RELATIVE_TO_SELF, PIVOT);
+		rotAnimation.setDuration(duration);
+		rotAnimation.setInterpolator(new LinearInterpolator());
+		rotAnimation.setFillAfter(true);
 		if (compassView != null) {
-			compassView.setAnimation(ra);
+			compassView.setAnimation(rotAnimation);
 		} else
 			Log.w(LCAT, "cannot rotate, view is null");
 		currentAzimut = -azimut;
