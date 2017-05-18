@@ -22,6 +22,7 @@ public class CompassviewModule extends KrollModule {
 	public static final String LCAT = "TiCompass";
 	public static final String PROP_BEARING = "bearing";
 	public static final String PROP_OFFSET = "offset";
+	public static final String PROP_DURATION = "duration";
 
 	// You can define constants with @Kroll.constant, for example:
 	// @Kroll.constant public static final String EXTERNAL_NAME = value;

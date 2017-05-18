@@ -8,24 +8,27 @@
  */
 package ti.compassview;
 
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.appcelerator.kroll.KrollDict;
-import org.appcelerator.kroll.KrollProxy;
 import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.TiApplication;
-import org.appcelerator.titanium.TiC;
 import org.appcelerator.kroll.common.AsyncResult;
 import org.appcelerator.kroll.common.Log;
-import org.appcelerator.kroll.common.TiConfig;
 import org.appcelerator.kroll.common.TiMessenger;
-import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.util.TiSensorHelper;
+import org.appcelerator.titanium.TiApplication;
+import org.appcelerator.titanium.TiC;
+import org.appcelerator.titanium.io.TiBaseFile;
+import org.appcelerator.titanium.io.TiFileFactory;
 import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.view.TiCompositeLayout;
-import org.appcelerator.titanium.view.TiCompositeLayout.LayoutArrangement;
+import org.appcelerator.titanium.util.TiSensorHelper;
+import org.appcelerator.titanium.util.TiUIHelper;
 import org.appcelerator.titanium.view.TiUIView;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -33,6 +36,9 @@ import android.hardware.SensorManager;
 import android.os.Message;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 // This proxy can be created by calling Compassview.createExample({message: "hello world"})
 @Kroll.proxy(creatableInModule = CompassviewModule.class, propertyAccessors = {
@@ -47,6 +53,8 @@ public class CompassViewProxy extends TiViewProxy implements
 	private static final int MSG_GET_BEARING = MSG_FIRST_ID + 502;
 	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 503;
 	private float currentAzimut = 0f;
+	private int duration = 200;
+	private String URL_REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
 
 	private static final String LCAT = "TiCompass";
 	private static Context ctx = TiApplication.getInstance()
@@ -55,25 +63,38 @@ public class CompassViewProxy extends TiViewProxy implements
 			.getSensorManager();
 
 	private float offset = 0;
+	private Bitmap bitmap;
+	private ImageView compassView;
 
 	private class CompassView extends TiUIView {
 		private float currentAzimut = 0;
 
-		public CompassView(TiViewProxy proxy) {
+		public CompassView(final TiViewProxy proxy) {
 			super(proxy);
-			LayoutArrangement arrangement = LayoutArrangement.DEFAULT;
-			if (proxy.hasProperty(TiC.PROPERTY_LAYOUT)) {
-				String layoutProperty = TiConvert.toString(proxy
-						.getProperty(TiC.PROPERTY_LAYOUT));
-				if (layoutProperty.equals(TiC.LAYOUT_HORIZONTAL)) {
-					arrangement = LayoutArrangement.HORIZONTAL;
-				} else if (layoutProperty.equals(TiC.LAYOUT_VERTICAL)) {
-					arrangement = LayoutArrangement.VERTICAL;
-				}
-			}
-			setNativeView(new TiCompositeLayout(proxy.getActivity(),
-					arrangement));
+			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
+					LayoutParams.WRAP_CONTENT);
+			LinearLayout container = new LinearLayout(proxy.getActivity());
+			container.setLayoutParams(lp);
+			compassView = new ImageView(proxy.getActivity());
+			compassView.setImageBitmap(bitmap);
+			container.addView(compassView);
+			setNativeView(container);
+
 		}
+	}
+
+	private Bitmap loadImageFromApplication(String imageName) {
+		Bitmap bitmap = null;
+		String url = null;
+		try {
+			url = resolveUrl(null, imageName);
+			TiBaseFile file = TiFileFactory.createTitaniumFile(
+					new String[] { url }, false);
+			bitmap = TiUIHelper.createBitmap(file.getInputStream());
+		} catch (IOException e) {
+			Log.e(LCAT, " WheelView only supports local image files " + url);
+		}
+		return bitmap;
 	}
 
 	// Constructor
@@ -196,9 +217,24 @@ public class CompassViewProxy extends TiViewProxy implements
 	@Override
 	public void handleCreationDict(KrollDict opts) {
 		super.handleCreationDict(opts);
+		if (opts.containsKey(CompassviewModule.PROP_DURATION)) {
+			duration = opts.getInt(CompassviewModule.PROP_DURATION);
+		}
 		if (opts.containsKey(CompassviewModule.PROP_OFFSET)) {
 			offset = opts.getInt(CompassviewModule.PROP_OFFSET);
 		}
+		if (opts.containsKeyAndNotNull(TiC.PROPERTY_IMAGE)) {
+			String image = opts.getString(TiC.PROPERTY_IMAGE);
+
+			Pattern p = Pattern.compile(URL_REGEX);
+			Matcher m = p.matcher(image);// replace with string to compare
+			if (m.find()) {
+				Log.w(LCAT, "only images from resources are allowed");
+			} else {
+				bitmap = loadImageFromApplication(image);
+			}
+		} else
+			Log.w(LCAT, "image missing");
 	}
 
 	@Override
@@ -212,16 +248,13 @@ public class CompassViewProxy extends TiViewProxy implements
 		RotateAnimation ra = new RotateAnimation(currentAzimut, -azimut,
 				Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
 				0.5f);
-		// how long the animation will take place
-		ra.setDuration(210);
+		ra.setDuration(duration);
 		ra.setFillAfter(true);
-		if (view != null) {
-			// Log.d(LCAT, "rotate=" + azimut);
-			view.setAnimatedRotationDegrees(-azimut);
+		if (compassView != null) {
+			compassView.setAnimation(ra);
 		} else
 			Log.w(LCAT, "cannot rotate, view is null");
-		// startAnimation(ra);
 		currentAzimut = -azimut;
-
 	}
+
 }
