@@ -5,13 +5,10 @@ This Titanium module realizes a compassview. This works faster and smother then 
  ## Usage
  
  ```javascript
- var view = require("ti.compassView").createCompassView({
+ var compassView = require("ti.compassView").createView({
  	offset : 0,
  	duration: 200,
  	image: "/asssets/arrow.png"
  });
- view.getBearing();
- view.setOffset(32);
- window.addEventListener("focus",function(){view.start();});
- window.addEventListener("blur",function(){view.stop();});
-  ```
+ compassView.getBearing();
+```

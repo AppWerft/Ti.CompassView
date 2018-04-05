@@ -2,12 +2,12 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 0.0.2
-apiversion: 2
-architectures: armeabi armeabi-v7a x86
+version: 4.0.2
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86
 description: CompassView
 author: Rainer Knöterich
-license: Specify your license
+license: MIT
 copyright: Copyright (c) 2017 by 
 
 # these should not be edited
@@ -15,4 +15,4 @@ name: compassview
 moduleid: ti.compassview
 guid: 3211c2b1-1d54-475f-805f-ac6cbb93af72
 platform: android
-minsdk: 3.5.0.GA
+minsdk: 7.0.0.
