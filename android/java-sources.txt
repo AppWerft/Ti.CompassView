@@ -1,4 +1,3 @@
-"/Users/fuerst/Documents/APPC_WORKSPACE/Ti.CompassView/android/src/ti/compassview/CompassView.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/Ti.CompassView/android/src/ti/compassview/CompassviewModule.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/Ti.CompassView/android/src/ti/compassview/ViewProxy.java"
 "/Users/fuerst/Documents/APPC_WORKSPACE/Ti.CompassView/android/build/generated/java/ti/compassview/CompassviewBootstrap.java"

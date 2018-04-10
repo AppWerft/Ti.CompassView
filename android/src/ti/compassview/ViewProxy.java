@@ -88,17 +88,25 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 
 				@Override
 				public void onFocusChange(View view, boolean hasFocus) {
+					Log.d(LCAT, "onFocusChange");
+					KrollDict dict = new KrollDict();
+					dict.put("hasFocus", hasFocus);
 					if (hasFocus) {
 						running = true;
 					} else {
 						running = false;
 					}
+					if (hasListeners("onFocusChange")) {
+						fireEvent("onFocusChange", dict);
+					}
+
 					// TODO Auto-generated method stub
 
 				}
 			});
 			container.addView(compassView);
 			setNativeView(container);
+			Log.d(LCAT, "CompassView added");
 
 		}
 	}
@@ -263,31 +271,35 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	// http://stackoverflow.com/questions/15155985/android-compass-bearing
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		if (running == true) {
-			final float PIVOT = 0.5f;
-			float azimut = event.values[0];
-			int overhead = Math.abs(event.values[1]) > 90 ? 180 : 0;
-			Display display = TiApplication.getAppRootOrCurrentActivity()
-					.getWindowManager().getDefaultDisplay();
-			int deviceRot = display.getRotation();
-			int compassrot = 0;
-			if (currentDeviceOrientation != deviceRot) {
-				Log.d(LCAT, "deviceRot=" + deviceRot);
-				currentDeviceOrientation = deviceRot;
-			}
-			azimut += deviceRot * 90;
-			RotateAnimation rotAnimation = new RotateAnimation(currentAzimut,
-					-azimut, Animation.RELATIVE_TO_SELF, PIVOT,
-					Animation.RELATIVE_TO_SELF, PIVOT);
-			rotAnimation.setDuration(duration);
-			rotAnimation.setInterpolator(new LinearInterpolator());
-			rotAnimation.setFillAfter(true);
-			if (compassView != null) {
-				compassView.setAnimation(rotAnimation);
-			} else
-				Log.w(LCAT, "cannot rotate, view is null");
-			currentAzimut = -azimut;
+		// if (running == true) {
+		final float PIVOT = 0.5f;
+		Log.d(LCAT, "onSensorChanged");
+
+		float azimut = event.values[0];
+		int overhead = Math.abs(event.values[1]) > 90 ? 180 : 0;
+		Activity activity = TiApplication.getAppRootOrCurrentActivity();
+		if (activity == null)
+			return;
+		Display display = activity.getWindowManager().getDefaultDisplay();
+		int deviceRot = display.getRotation();
+		int compassrot = 0;
+		if (currentDeviceOrientation != deviceRot) {
+			Log.d(LCAT, "deviceRot=" + deviceRot);
+			currentDeviceOrientation = deviceRot;
 		}
+		azimut += deviceRot * 90;
+		RotateAnimation rotAnimation = new RotateAnimation(currentAzimut,
+				-azimut, Animation.RELATIVE_TO_SELF, PIVOT,
+				Animation.RELATIVE_TO_SELF, PIVOT);
+		rotAnimation.setDuration(duration);
+		rotAnimation.setInterpolator(new LinearInterpolator());
+		rotAnimation.setFillAfter(true);
+		if (compassView != null) {
+			compassView.setAnimation(rotAnimation);
+		} else
+			Log.w(LCAT, "cannot rotate, view is null");
+		currentAzimut = -azimut;
+		// }
 
 	}
 
