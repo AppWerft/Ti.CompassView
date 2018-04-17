@@ -49,6 +49,7 @@ import android.widget.LinearLayout.LayoutParams;
 // This proxy can be created by calling Compassview.createExample({message: "hello world"})
 @Kroll.proxy(creatableInModule = CompassviewModule.class, propertyAccessors = {
 		CompassviewModule.PROP_OFFSET, CompassviewModule.PROP_BEARING })
+
 public class ViewProxy extends TiViewProxy implements SensorEventListener {
 
 	TiUIView view;
@@ -71,9 +72,13 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	private float offset = 0;
 	private Bitmap bitmap;
 	private ImageView compassView;
-	private Boolean running;
+	private Boolean hasFocus;
 
-	private class CompassView extends TiUIView {
+	public interface IOnFocusListenable {
+		   public void onWindowFocusChanged(boolean hasFocus);
+	}
+	
+	private class CompassView extends TiUIView implements IOnFocusListenable {
 		private float currentAzimut = 0;
 
 		public CompassView(final TiViewProxy proxy) {
@@ -84,30 +89,30 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 			container.setLayoutParams(lp);
 			compassView = new ImageView(proxy.getActivity());
 			compassView.setImageBitmap(bitmap);
-			compassView.setOnFocusChangeListener(new OnFocusChangeListener() {
-
-				@Override
-				public void onFocusChange(View view, boolean hasFocus) {
-					Log.d(LCAT, "onFocusChange");
-					KrollDict dict = new KrollDict();
-					dict.put("hasFocus", hasFocus);
-					if (hasFocus) {
-						running = true;
-					} else {
-						running = false;
-					}
-					if (hasListeners("onFocusChange")) {
-						fireEvent("onFocusChange", dict);
-					}
-
-					// TODO Auto-generated method stub
-
-				}
-			});
+			
+			
 			container.addView(compassView);
 			setNativeView(container);
 			Log.d(LCAT, "CompassView added");
 
+		}
+
+		@Override
+		public void onWindowFocusChanged(boolean _hasFocus) {
+			hasFocus = _hasFocus;
+			if (hasFocus == true)
+				handleStart();
+			else
+				handleStop();
+			Log.d(LCAT, "onFocusChange");
+			KrollDict dict = new KrollDict();
+			dict.put("hasFocus", hasFocus);
+
+			if (hasListeners("onFocusChange")) {
+				fireEvent("onFocusChange", dict);
+			}
+
+			
 		}
 	}
 
@@ -136,6 +141,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	// Constructor
 	public ViewProxy() {
 		super();
+		//TiApplication.getAppRootOrCurrentActivity().onWindowFocusChanged(hasFocus);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -271,12 +277,13 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	// http://stackoverflow.com/questions/15155985/android-compass-bearing
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		// if (running == true) {
+		// if (hasFocus == true) {
 		final float PIVOT = 0.5f;
 		Log.d(LCAT, "onSensorChanged");
 
 		float azimut = event.values[0];
 		int overhead = Math.abs(event.values[1]) > 90 ? 180 : 0;
+
 		Activity activity = TiApplication.getAppRootOrCurrentActivity();
 		if (activity == null)
 			return;
