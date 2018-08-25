@@ -21,9 +21,11 @@ public class CompassviewModule extends KrollModule {
 	// Standard Debugging variables
 	public static final String LCAT = "TiCompass";
 	public static final String PROP_BEARING = "bearing";
+	public static final String PROP_TYPE = "rotationtype";
 	public static final String PROP_OFFSET = "offset";
 	public static final String PROP_DURATION = "duration";
-
+	public static final int TYPE_COMPASS = -1;
+	public static final int TYPE_RADAR = 1;
 	public CompassviewModule() {
 		super();
 	}

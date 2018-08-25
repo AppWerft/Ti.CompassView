@@ -49,7 +49,6 @@ import android.widget.LinearLayout.LayoutParams;
 // This proxy can be created by calling Compassview.createExample({message: "hello world"})
 @Kroll.proxy(creatableInModule = CompassviewModule.class, propertyAccessors = {
 		CompassviewModule.PROP_OFFSET, CompassviewModule.PROP_BEARING })
-
 public class ViewProxy extends TiViewProxy implements SensorEventListener {
 
 	TiUIView view;
@@ -58,14 +57,14 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	private static final int MSG_STOP = MSG_FIRST_ID + 501;
 	private static final int MSG_GET_BEARING = MSG_FIRST_ID + 502;
 	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 503;
-	private float currentAzimut = 0f;
+	private float lastΦ = 0f;
 	private int currentDeviceOrientation = 0;
-	private int duration = 200;
+	private int duration = 50;
+	private int rotationType = CompassviewModule.TYPE_RADAR;
 	private String URL_REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
 
 	private static final String LCAT = "TiCompass";
-	private static Context ctx = TiApplication.getInstance()
-			.getApplicationContext();
+	
 	private static SensorManager sensorManager = TiSensorHelper
 			.getSensorManager();
 
@@ -73,13 +72,13 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	private Bitmap bitmap;
 	private ImageView compassView;
 	private Boolean hasFocus;
-
-	public interface IOnFocusListenable {
-		   public void onWindowFocusChanged(boolean hasFocus);
-	}
 	
+	public interface IOnFocusListenable {
+		public void onWindowFocusChanged(boolean hasFocus);
+	}
+
 	private class CompassView extends TiUIView implements IOnFocusListenable {
-		private float currentAzimut = 0;
+		
 
 		public CompassView(final TiViewProxy proxy) {
 			super(proxy);
@@ -89,8 +88,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 			container.setLayoutParams(lp);
 			compassView = new ImageView(proxy.getActivity());
 			compassView.setImageBitmap(bitmap);
-			
-			
+
 			container.addView(compassView);
 			setNativeView(container);
 			Log.d(LCAT, "CompassView added");
@@ -104,15 +102,12 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 				handleStart();
 			else
 				handleStop();
-			Log.d(LCAT, "onFocusChange");
 			KrollDict dict = new KrollDict();
 			dict.put("hasFocus", hasFocus);
-
 			if (hasListeners("onFocusChange")) {
 				fireEvent("onFocusChange", dict);
 			}
 
-			
 		}
 	}
 
@@ -141,7 +136,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	// Constructor
 	public ViewProxy() {
 		super();
-		//TiApplication.getAppRootOrCurrentActivity().onWindowFocusChanged(hasFocus);
+		// TiApplication.getAppRootOrCurrentActivity().onWindowFocusChanged(hasFocus);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -256,6 +251,10 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		if (opts.containsKey(CompassviewModule.PROP_OFFSET)) {
 			offset = opts.getInt(CompassviewModule.PROP_OFFSET);
 		}
+		if (opts.containsKeyAndNotNull(CompassviewModule.PROP_TYPE)) {
+			Log.i(LCAT, CompassviewModule.PROP_TYPE + " imported");
+			rotationType = opts.getInt(CompassviewModule.PROP_TYPE);
+		}
 		if (opts.containsKeyAndNotNull(TiC.PROPERTY_IMAGE)) {
 			String image = opts.getString(TiC.PROPERTY_IMAGE);
 
@@ -274,40 +273,34 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	public void onAccuracyChanged(Sensor sensor, int event) {
 	}
 
+	private int getDeviceRotation() {
+		Activity activity = TiApplication.getAppRootOrCurrentActivity();
+		if (activity == null)
+			return 0;
+		Display display = activity.getWindowManager().getDefaultDisplay();
+		int deviceRot = display.getRotation();
+		if (currentDeviceOrientation != deviceRot) {
+			currentDeviceOrientation = deviceRot;
+		}
+		return deviceRot * 90;
+	}
+
 	// http://stackoverflow.com/questions/15155985/android-compass-bearing
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		// if (hasFocus == true) {
 		final float PIVOT = 0.5f;
-		Log.d(LCAT, "onSensorChanged");
-
-		float azimut = event.values[0];
-		int overhead = Math.abs(event.values[1]) > 90 ? 180 : 0;
-
-		Activity activity = TiApplication.getAppRootOrCurrentActivity();
-		if (activity == null)
-			return;
-		Display display = activity.getWindowManager().getDefaultDisplay();
-		int deviceRot = display.getRotation();
-		int compassrot = 0;
-		if (currentDeviceOrientation != deviceRot) {
-			Log.d(LCAT, "deviceRot=" + deviceRot);
-			currentDeviceOrientation = deviceRot;
-		}
-		azimut += deviceRot * 90;
-		RotateAnimation rotAnimation = new RotateAnimation(currentAzimut,
-				-azimut, Animation.RELATIVE_TO_SELF, PIVOT,
-				Animation.RELATIVE_TO_SELF, PIVOT);
-		rotAnimation.setDuration(duration);
-		rotAnimation.setInterpolator(new LinearInterpolator());
-		rotAnimation.setFillAfter(true);
+		final int TYPE = Animation.RELATIVE_TO_SELF;
+		float currentΦ = event.values[0];
+		//currentΦ += getDeviceRotation();
+	//	Log.i(LCAT, "rotationType = " + rotationtype);
+		RotateAnimation ra = new RotateAnimation(lastΦ, rotationType*currentΦ, TYPE,
+				PIVOT, TYPE, PIVOT);
+		ra.setDuration(duration);
+		ra.setInterpolator(new LinearInterpolator());
+		ra.setFillAfter(true);
 		if (compassView != null) {
-			compassView.setAnimation(rotAnimation);
-		} else
-			Log.w(LCAT, "cannot rotate, view is null");
-		currentAzimut = -azimut;
-		// }
-
+			compassView.startAnimation(ra);
+		}
+		lastΦ = rotationType*currentΦ;
 	}
-
 }
