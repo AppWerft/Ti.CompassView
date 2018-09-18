@@ -5,7 +5,7 @@ This Titanium module realizes a compassview. This works faster and smoother then
  ## Usage
  
  ```javascript
- var Compass =  require("ti.compassView"); 
+ var Compass =  require("ti.compassview"); 
  var compassView =  Compass.createView({
    offset : 10,
    type  : Compass.TYPE_RADAR, // or TYPE_COMPASS
@@ -14,4 +14,5 @@ This Titanium module realizes a compassview. This works faster and smoother then
    image: "/asssets/arrow.png"
  });
  compassView.getBearing();
+ compassView.setOffset(45); 
 ```
