@@ -48,7 +48,7 @@ import android.widget.LinearLayout.LayoutParams;
 
 // This proxy can be created by calling Compassview.createExample({message: "hello world"})
 @Kroll.proxy(creatableInModule = CompassviewModule.class, propertyAccessors = {
-		CompassviewModule.PROP_OFFSET, CompassviewModule.PROP_BEARING })
+		 CompassviewModule.PROP_BEARING })
 public class ViewProxy extends TiViewProxy implements SensorEventListener {
 
 	TiUIView view;
