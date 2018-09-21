@@ -68,8 +68,9 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	private static SensorManager sensorManager = TiSensorHelper
 			.getSensorManager();
 
-	private float offset = 0.0f;
+	private double offset = 0.0f;
 	private Bitmap bitmap;
+	private Boolean autostart = true;
 	private ImageView compassView;
 	private Boolean hasFocus;
 
@@ -77,7 +78,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		public void onWindowFocusChanged(boolean hasFocus);
 	}
 
-	private class CompassView extends TiUIView implements IOnFocusListenable {
+	private class CompassView extends TiUIView  {
 		public CompassView(final TiViewProxy proxy) {
 			super(proxy);
 			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -86,26 +87,8 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 			container.setLayoutParams(lp);
 			compassView = new ImageView(proxy.getActivity());
 			compassView.setImageBitmap(bitmap);
-
 			container.addView(compassView);
 			setNativeView(container);
-			Log.d(LCAT, "CompassView added");
-
-		}
-
-		@Override
-		public void onWindowFocusChanged(boolean _hasFocus) {
-			hasFocus = _hasFocus;
-			if (hasFocus == true)
-				handleStart();
-			else
-				handleStop();
-			KrollDict dict = new KrollDict();
-			dict.put("hasFocus", hasFocus);
-			if (hasListeners("onFocusChange")) {
-				fireEvent("onFocusChange", dict);
-			}
-
 		}
 	}
 
@@ -137,14 +120,13 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		// TiApplication.getAppRootOrCurrentActivity().onWindowFocusChanged(hasFocus);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public boolean handleMessage(Message msg) {
 		AsyncResult result = null;
 		switch (msg.what) {
 		case MSG_SET_OFFSET: {
 			result = (AsyncResult) msg.obj;
-			handleSetOffset((Float) result.getArg());
+			handleSetOffset((Double) result.getArg());
 			result.setResult(null);
 			return true;
 		}
@@ -207,32 +189,34 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		sensorManager.unregisterListener(this);
 	}
 
+	@Kroll.setProperty
 	@Kroll.method
-	public void setOffset(float offset) {
+	public void setOffset(double offset) {
+		
 		if (TiApplication.isUIThread()) {
-			Log.d(LCAT, "setOffset isUIThread ");
+			Log.d(LCAT, "setOffset directly Java " + offset);
 			this.offset = offset;
 		} else {
-			Log.d(LCAT, "setOffset over messenger");
+			Log.d(LCAT, "setOffset by messenger Java " + offset);
 			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(
 					MSG_SET_OFFSET, offset));
-
 		}
 	}
 
-	private void handleSetOffset(float offset) {
+	private void handleSetOffset(double offset) {
 		Log.d(LCAT, "setOffset handleSetOffset " + offset);
 		this.offset = offset;
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
-	public float getBearing() {
+	public double getBearing() {
 		if (TiApplication.isUIThread()) {
 			return handleGetBearing();
 		} else {
-			return (Float) TiMessenger.sendBlockingMainMessage(getMainHandler()
-					.obtainMessage(MSG_SET_OFFSET));
+			return (Double) TiMessenger
+					.sendBlockingMainMessage(getMainHandler().obtainMessage(
+							MSG_SET_OFFSET));
 
 		}
 	}
@@ -249,11 +233,14 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 			duration = opts.getInt(CompassviewModule.PROP_DURATION);
 		}
 		if (opts.containsKeyAndNotNull(CompassviewModule.PROP_OFFSET)) {
-			offset = opts.getDouble(CompassviewModule.PROP_OFFSET).floatValue();
+			offset = opts.getDouble(CompassviewModule.PROP_OFFSET);
 		}
 		if (opts.containsKeyAndNotNull(CompassviewModule.PROP_TYPE)) {
 			Log.i(LCAT, CompassviewModule.PROP_TYPE + " imported");
 			rotationType = opts.getInt(CompassviewModule.PROP_TYPE);
+		}
+		if (opts.containsKeyAndNotNull("autostart")) {
+			autostart = opts.getBoolean("autostart");
 		}
 		if (opts.containsKeyAndNotNull(TiC.PROPERTY_IMAGE)) {
 			String image = opts.getString(TiC.PROPERTY_IMAGE);
