@@ -115,14 +115,10 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		int x = (int) (currentΦ * contentWidth / 360);
 		// Log.d(LCAT, "scrollTo=" + x + " " + currentΦ);
 		if (TiApplication.isUIThread()) {
-			Log.d(LCAT, "direct handleStart()");
 			handleSetOffset(x);
 		} else {
-			Log.d(LCAT, "indirect handleStart() by TiMessenger");
 			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_SET_OFFSET));
-
 		}
-		sv.setContentOffset(x, 0);
 	}
 
 	private void handleSetOffset(int x) {
