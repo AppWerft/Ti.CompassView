@@ -21,16 +21,18 @@ This Titanium module realizes a compassview. This works faster and smoother then
 
 ### Shifting content of ScrollView following compass sensor
 
-```
+```javascript
 const Compass =  require("ti.compassview"); 
 const containerView = Ti.UI.createScrollView({
 	scrollType : 'horizontal';
 	contentWidth : 3000,
 	width: Ti.UI.FILL
 });
+// optional background image
 containerView.add(Ti.UI.createImageView({
 	image : 360°_PANOIMAGE
 }));
+// some numbers:
 for ( i = 0; i < 360; i += 30) {
 		containerView.add(Ti.UI.createLabel({
 			text : i + '°',
