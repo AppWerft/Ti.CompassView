@@ -18,11 +18,13 @@ import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.util.TiSensorHelper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import ti.modules.titanium.ui.ScrollViewProxy;
 import ti.modules.titanium.ui.widget.TiUIScrollView;
@@ -48,6 +50,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private int contentWidth;
 	private static final int MSG_FIRST_ID = KrollModule.MSG_LAST_ID + 1;
 	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 500;
+	private static Context ctx = TiApplication.getInstance().getApplicationContext();
+	final float density = ctx.getResources().getDisplayMetrics().density;
 
 	public CompassviewModule() {
 		super();
@@ -55,6 +59,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
+		DisplayMetrics dm = new DisplayMetrics();
 	}
 
 	@Override
@@ -110,7 +115,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	public void onSensorChanged(SensorEvent event) {
 		float currentΦ = event.values[0];
 		currentΦ += getDeviceRotation();
-		int x = (int) (currentΦ * contentWidth / 360);
+		int x = (int) (currentΦ * contentWidth / 360 / density);
 		if (TiApplication.isUIThread()) {
 			handleSetOffset(x);
 		} else {
