@@ -120,7 +120,6 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 	private void handleSetOffset(int x) {
 		Log.d(LCAT, "scrollTo=" + x);
-		sv.setContentOffset(x, 0);
 		sv.scrollTo(x, 0, false);
 	}
 }
