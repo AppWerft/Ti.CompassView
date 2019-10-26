@@ -115,7 +115,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	public void onSensorChanged(SensorEvent event) {
 		float currentΦ = event.values[0];
 		currentΦ += getDeviceRotation();
-		int x = (int) (currentΦ * contentWidth / 360 * density);
+		int x = (int) (currentΦ * contentWidth / 360 / density);
 		if (TiApplication.isUIThread()) {
 			handleSetOffset(x);
 		} else {
@@ -124,7 +124,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	}
 
 	private void handleSetOffset(int x) {
-		Log.d(LCAT, "scrollTo=" + x);
+		Log.d(LCAT, "scrollTo=" + x + " / " + contentWidth);
 		sv.scrollTo(x, 0, false);
 	}
 }
