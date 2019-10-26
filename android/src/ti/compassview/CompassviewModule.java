@@ -107,13 +107,11 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		return deviceRot * 90;
 	}
 
-	// http://stackoverflow.com/questions/15155985/android-compass-bearing
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		float currentΦ = event.values[0];
 		currentΦ += getDeviceRotation();
 		int x = (int) (currentΦ * contentWidth / 360);
-		// Log.d(LCAT, "scrollTo=" + x + " " + currentΦ);
 		if (TiApplication.isUIThread()) {
 			handleSetOffset(x);
 		} else {
@@ -122,6 +120,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	}
 
 	private void handleSetOffset(int x) {
+		// Log.d(LCAT, "scrollTo=" + x);
 		sv.setContentOffset(x, 0);
 	}
 }
