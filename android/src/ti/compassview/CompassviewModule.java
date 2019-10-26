@@ -9,13 +9,27 @@
 package ti.compassview;
 
 import org.appcelerator.kroll.KrollModule;
+import org.appcelerator.kroll.annotations.Kroll;
+import org.appcelerator.kroll.common.AsyncResult;
+import org.appcelerator.kroll.common.Log;
+import org.appcelerator.kroll.common.TiMessenger;
+import org.appcelerator.titanium.TiApplication;
+import org.appcelerator.titanium.TiC;
+import org.appcelerator.titanium.util.TiSensorHelper;
+
+import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Message;
+import android.view.Display;
 import ti.modules.titanium.ui.ScrollViewProxy;
 import ti.modules.titanium.ui.widget.TiUIScrollView;
-import org.appcelerator.kroll.annotations.Kroll;
-import org.appcelerator.titanium.TiApplication;
+import ti.modules.titanium.ui.widget.TiUIScrollView.TiScrollViewLayout;
 
 @Kroll.module(name = "Compassview", id = "ti.compassview")
-public class CompassviewModule extends KrollModule {
+public class CompassviewModule extends KrollModule implements SensorEventListener {
 
 	// Standard Debugging variables
 	public static final String LCAT = "TiCompass";
@@ -25,6 +39,15 @@ public class CompassviewModule extends KrollModule {
 	public static final String PROP_DURATION = "duration";
 	public static final int TYPE_COMPASS = -1;
 	public static final int TYPE_RADAR = 1;
+	private int currentDeviceOrientation = 0;
+	private double offset = 0;
+	private static SensorManager sensorManager = TiSensorHelper.getSensorManager();
+	private Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+	private int sensorDelay = SensorManager.SENSOR_DELAY_UI;
+	TiUIScrollView sv;
+	private int contentWidth;
+	private static final int MSG_FIRST_ID = KrollModule.MSG_LAST_ID + 1;
+	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 500;
 
 	public CompassviewModule() {
 		super();
@@ -34,14 +57,75 @@ public class CompassviewModule extends KrollModule {
 	public static void onAppCreate(TiApplication app) {
 	}
 
-	@Kroll.method
-	public void setCompassTracker(@Kroll.argument(optional = true) Object view,
-			@Kroll.argument(optional = true) Object opts) {
-		if (view == null) {
-
-		} else if (view instanceof ScrollViewProxy) {
-
+	@Override
+	public boolean handleMessage(Message msg) {
+		AsyncResult result = null;
+		switch (msg.what) {
+		case MSG_SET_OFFSET: {
+			result = (AsyncResult) msg.obj;
+			handleSetOffset((int) result.getArg());
+			result.setResult(null);
+			return true;
 		}
 
+		default: {
+			return super.handleMessage(msg);
+		}
+		}
+	}
+
+	@Kroll.method
+	public void addCompassTracker(@Kroll.argument(optional = true) Object view,
+			@Kroll.argument(optional = true) Object opts) {
+		if (view == null) {
+			Log.e(LCAT, "first argument must be defined");
+		} else if (view instanceof ScrollViewProxy) {
+			sv = (TiUIScrollView) ((ScrollViewProxy) view).getOrCreateView();
+			contentWidth = (int) sv.getProxy().getProperty(TiC.PROPERTY_CONTENT_WIDTH);
+			sensorManager.registerListener(CompassviewModule.this, sensor, sensorDelay);
+			sensorManager.registerListener(CompassviewModule.this,
+					sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorDelay);
+		} else {
+			Log.e(LCAT, "first argument must be a scrollView");
+		}
+
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int event) {
+	}
+
+	private int getDeviceRotation() {
+		Activity activity = TiApplication.getAppRootOrCurrentActivity();
+		if (activity == null)
+			return 0;
+		Display display = activity.getWindowManager().getDefaultDisplay();
+		int deviceRot = display.getRotation();
+		if (currentDeviceOrientation != deviceRot) {
+			currentDeviceOrientation = deviceRot;
+		}
+		return deviceRot * 90;
+	}
+
+	// http://stackoverflow.com/questions/15155985/android-compass-bearing
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		float currentΦ = event.values[0];
+		currentΦ += getDeviceRotation();
+		int x = (int) (currentΦ * contentWidth / 360);
+		// Log.d(LCAT, "scrollTo=" + x + " " + currentΦ);
+		if (TiApplication.isUIThread()) {
+			Log.d(LCAT, "direct handleStart()");
+			handleSetOffset(x);
+		} else {
+			Log.d(LCAT, "indirect handleStart() by TiMessenger");
+			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_SET_OFFSET));
+
+		}
+		sv.setContentOffset(x, 0);
+	}
+
+	private void handleSetOffset(int x) {
+		sv.setContentOffset(x, 0);
 	}
 }
