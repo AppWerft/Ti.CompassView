@@ -31,6 +31,20 @@ const containerView = Ti.UI.createScrollView({
 containerView.add(Ti.UI.createImageView({
 	image : 360°_PANOIMAGE
 }));
+for ( i = 0; i < 360; i += 30) {
+		containerView.add(Ti.UI.createLabel({
+			text : i + '°',
+			bottom : 10,
+			left : 3000 / 360*i,
+			height : Ti.UI.SIZE,
+			width : Ti.UI.SIZE,
+			color : "yellow",
+			font : {
+				fontSize : 14,
+				fontWeight : 'bold'
+			}
+		}));
+}
 Compass.setCompassTracker(containerView,{
 	offset : 0 // offset to north
 });
