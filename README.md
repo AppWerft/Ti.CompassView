@@ -4,6 +4,8 @@ This Titanium module realizes a compassview. This works faster and smoother then
  
  ## Usage
  
+ ### Rotating image (compass) following compass sensor
+ 
  ```javascript
  var Compass =  require("ti.compassview"); 
  var compassView =  Compass.createView({
@@ -15,4 +17,21 @@ This Titanium module realizes a compassview. This works faster and smoother then
  });
  compassView.getBearing();
  compassView.setOffset(45); 
+```
+
+### Shifting content of ScrollView following compass sensor
+
+```
+const Compass =  require("ti.compassview"); 
+const containerView = Ti.UI.createScrollView({
+	scrollType : 'horizontal';
+	contentWidth : 3000,
+	width: Ti.UI.FILL
+});
+containerView.add(Ti.UI.createImageView({
+	image : 360°_PANOIMAGE
+}));
+Compass.setCompassTracker(containerView,{
+	offset : 0 // offset to north
+});
 ```

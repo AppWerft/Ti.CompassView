@@ -9,11 +9,10 @@
 package ti.compassview;
 
 import org.appcelerator.kroll.KrollModule;
+import ti.modules.titanium.ui.ScrollViewProxy;
+import ti.modules.titanium.ui.widget.TiUIScrollView;
 import org.appcelerator.kroll.annotations.Kroll;
-
 import org.appcelerator.titanium.TiApplication;
-import org.appcelerator.kroll.common.Log;
-import org.appcelerator.kroll.common.TiConfig;
 
 @Kroll.module(name = "Compassview", id = "ti.compassview")
 public class CompassviewModule extends KrollModule {
@@ -26,11 +25,23 @@ public class CompassviewModule extends KrollModule {
 	public static final String PROP_DURATION = "duration";
 	public static final int TYPE_COMPASS = -1;
 	public static final int TYPE_RADAR = 1;
+
 	public CompassviewModule() {
 		super();
 	}
 
 	@Kroll.onAppCreate
 	public static void onAppCreate(TiApplication app) {
+	}
+
+	@Kroll.method
+	public void setCompassTracker(@Kroll.argument(optional = true) Object view,
+			@Kroll.argument(optional = true) Object opts) {
+		if (view == null) {
+
+		} else if (view instanceof ScrollViewProxy) {
+
+		}
+
 	}
 }

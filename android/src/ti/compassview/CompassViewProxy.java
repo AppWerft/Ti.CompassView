@@ -46,10 +46,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
-// This proxy can be created by calling Compassview.createExample({message: "hello world"})
-@Kroll.proxy(creatableInModule = CompassviewModule.class, propertyAccessors = {
-		 CompassviewModule.PROP_BEARING })
-public class ViewProxy extends TiViewProxy implements SensorEventListener {
+/*
+ * Sergey Volkov [6 minutes ago]
+Better solution will be:
+1. keep  `CompassviewModule.PROP_OFFSET` in `propertyAccessors`
+2. override `propertyChanged` in `CompassView`
+3. also implement `processProperties` in `CompassView`
+ * 
+ */
+@Kroll.proxy(creatableInModule = CompassviewModule.class, propertyAccessors = { CompassviewModule.PROP_BEARING })
+public class CompassViewProxy extends TiViewProxy implements SensorEventListener {
 
 	TiUIView view;
 	private static final int MSG_FIRST_ID = TiViewProxy.MSG_LAST_ID + 1;
@@ -65,8 +71,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 
 	private static final String LCAT = "TiCompass";
 
-	private static SensorManager sensorManager = TiSensorHelper
-			.getSensorManager();
+	private static SensorManager sensorManager = TiSensorHelper.getSensorManager();
 
 	private double offset = 0.0f;
 	private Bitmap bitmap;
@@ -78,11 +83,10 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		public void onWindowFocusChanged(boolean hasFocus);
 	}
 
-	private class CompassView extends TiUIView  {
+	private class CompassView extends TiUIView {
 		public CompassView(final TiViewProxy proxy) {
 			super(proxy);
-			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
-					LayoutParams.WRAP_CONTENT);
+			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			LinearLayout container = new LinearLayout(proxy.getActivity());
 			container.setLayoutParams(lp);
 			compassView = new ImageView(proxy.getActivity());
@@ -105,8 +109,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		String url = null;
 		try {
 			url = resolveUrl(null, imageName);
-			TiBaseFile file = TiFileFactory.createTitaniumFile(
-					new String[] { url }, false);
+			TiBaseFile file = TiFileFactory.createTitaniumFile(new String[] { url }, false);
 			bitmap = TiUIHelper.createBitmap(file.getInputStream());
 		} catch (IOException e) {
 			Log.e(LCAT, " WheelView only supports local image files " + url);
@@ -115,7 +118,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	}
 
 	// Constructor
-	public ViewProxy() {
+	public CompassViewProxy() {
 		super();
 		// TiApplication.getAppRootOrCurrentActivity().onWindowFocusChanged(hasFocus);
 	}
@@ -154,14 +157,23 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	}
 
 	@Kroll.method
+	public void startTracking() {
+		start();
+	}
+
+	@Kroll.method
+	public void stopTracking() {
+		stop();
+	}
+
+	@Kroll.method
 	public void start() {
 		if (TiApplication.isUIThread()) {
 			Log.d(LCAT, "direct handleStart()");
 			handleStart();
 		} else {
 			Log.d(LCAT, "indirect handleStart() by TiMessenger");
-			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(
-					MSG_START));
+			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_START));
 
 		}
 	}
@@ -170,8 +182,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		Log.d(LCAT, "handleStart()");
 		@SuppressWarnings("deprecation")
 		Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-		sensorManager.registerListener(this, sensor,
-				SensorManager.SENSOR_DELAY_GAME);
+		sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
 	}
 
 	@Kroll.method
@@ -179,8 +190,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		if (TiApplication.isUIThread()) {
 			handleStart();
 		} else {
-			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(
-					MSG_STOP));
+			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_STOP));
 
 		}
 	}
@@ -192,14 +202,13 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 	@Kroll.setProperty
 	@Kroll.method
 	public void setOffset(double offset) {
-		
+
 		if (TiApplication.isUIThread()) {
 			Log.d(LCAT, "setOffset directly Java " + offset);
 			this.offset = offset;
 		} else {
 			Log.d(LCAT, "setOffset by messenger Java " + offset);
-			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(
-					MSG_SET_OFFSET, offset));
+			TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_SET_OFFSET, offset));
 		}
 	}
 
@@ -214,9 +223,7 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		if (TiApplication.isUIThread()) {
 			return handleGetBearing();
 		} else {
-			return (Double) TiMessenger
-					.sendBlockingMainMessage(getMainHandler().obtainMessage(
-							MSG_SET_OFFSET));
+			return (Double) TiMessenger.sendBlockingMainMessage(getMainHandler().obtainMessage(MSG_SET_OFFSET));
 
 		}
 	}
@@ -279,12 +286,10 @@ public class ViewProxy extends TiViewProxy implements SensorEventListener {
 		final float PIVOT = 0.5f;
 		final int TYPE = Animation.RELATIVE_TO_SELF;
 		float currentΦ = event.values[0];
-		Log.d(LCAT, "offset=" + offset + "  currentΦ=" + currentΦ
-				+ " deviceRotation=" + getDeviceRotation());
+		Log.d(LCAT, "offset=" + offset + "  currentΦ=" + currentΦ + " deviceRotation=" + getDeviceRotation());
 		currentΦ += getDeviceRotation();
 		currentΦ += offset;
-		RotateAnimation ra = new RotateAnimation(lastΦ,
-				rotationType * currentΦ, TYPE, PIVOT, TYPE, PIVOT);
+		RotateAnimation ra = new RotateAnimation(lastΦ, rotationType * currentΦ, TYPE, PIVOT, TYPE, PIVOT);
 		ra.setDuration(duration);
 		ra.setInterpolator(new LinearInterpolator());
 		ra.setFillAfter(true);
