@@ -60,7 +60,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 500;
 	private static Context ctx = TiApplication.getInstance().getApplicationContext();
 	final float density = ctx.getResources().getDisplayMetrics().density;
-	public static final String MIME_TYPE_PNG = "image/png";s
+	public static final String MIME_TYPE_PNG = "image/png";
 
 	public CompassviewModule() {
 		super();
@@ -158,11 +158,11 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		KrollProxy proxy = sv.getProxy();
 		// doubling of container width:
 		sv.getLayout().setParentContentWidth(2 * contentWidth);
-
+		// making screenshot:
 		KrollDict imageBlob = TiUIHelper.viewToImage(proxy.getProperties(), sv.getOuterView());
 		byte[] byteArray = (byte[]) imageBlob.get("media");
 		Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-		sv.getLayout().setMinimumWidth(2 * contentWidth);
+		// new image view for right edge:
 		ImageView dummy = new ImageView(ctx);
 		dummy.setImageBitmap(bitmap);
 	}
