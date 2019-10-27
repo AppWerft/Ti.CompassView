@@ -1,12 +1,13 @@
 # Ti.CompassView
 
-This Titanium module realizes a compassview. This works faster and smoother then a pure JS solution, because the event managing over KrollProxy is avoided.
+This Axway Titanium module realizes a compassview. This works faster and smoother then a pure JS solution, because the event managing over KrollProxy is avoided.
+
  
- ## Usage
+## Usage
  
- ### Rotating image (compass) following compass sensor
+### Rotating image (compass) following compass sensor
  
- ```javascript
+```javascript
  var Compass =  require("ti.compassview"); 
  var compassView =  Compass.createView({
    offset : 10,
@@ -18,14 +19,13 @@ This Titanium module realizes a compassview. This works faster and smoother then
  compassView.getBearing();
  compassView.setOffset(45); 
 ```
-
 ### Shifting content of ScrollView following compass sensor
 
 ```javascript
 const Compass =  require("ti.compassview"); 
 const containerView = Ti.UI.createScrollView({
 	scrollType : 'horizontal';
-	contentWidth : 3000,
+	contentWidth : 3000, // must be numeric, Ti.UI.SIZE doesn't work !
 	width: Ti.UI.FILL
 });
 // optional background image
@@ -49,5 +49,6 @@ for ( i = 0; i < 360; i += 30) {
 }
 Compass.setCompassTracker(containerView,{
 	offset : 0 // offset to north
+	smoothy : true  // uses smoothScroll
 });
 ```
