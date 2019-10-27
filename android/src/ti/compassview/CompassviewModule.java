@@ -33,6 +33,7 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import ti.modules.titanium.ui.ScrollViewProxy;
 import ti.modules.titanium.ui.widget.TiUIScrollView;
 import ti.modules.titanium.ui.widget.TiUIScrollView.TiScrollViewLayout;
@@ -109,8 +110,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			// getting original contentWidth (must be numeric, Ti.UI.SIZE doesn't work):
 			contentWidth = (int) sv.getProxy().getProperty(TiC.PROPERTY_CONTENT_WIDTH);
 
-			addDummyImage();
-
+			ImageView dummy = getDummyImage();
 			// starting tracking:
 			sensorManager.registerListener(CompassviewModule.this, sensor, sensorDelay);
 			sensorManager.registerListener(CompassviewModule.this,
@@ -154,7 +154,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 	}
 
-	private void addDummyImage() {
+	private ImageView getDummyImage() {
 		KrollProxy proxy = sv.getProxy();
 		// doubling of container width:
 		sv.getLayout().setParentContentWidth(2 * contentWidth);
@@ -165,6 +165,9 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		// new image view for right edge:
 		ImageView dummy = new ImageView(ctx);
 		dummy.setImageBitmap(bitmap);
+		dummy.setPadding(contentWidth, 0, 0, 0);
+		sv.getLayout().addView(dummy);
+		return dummy;
 	}
 
 }
