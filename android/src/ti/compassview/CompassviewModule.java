@@ -160,7 +160,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		sv.getLayout().setParentContentWidth(2 * contentWidth);
 		// making screenshot:
 		KrollDict imageBlob = TiUIHelper.viewToImage(proxy.getProperties(), sv.getOuterView());
-		byte[] byteArray = (byte[]) imageBlob.get("media");
+		byte[] byteArray = (byte[]) (imageBlob.get("media"));
 		Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 		// new image view for right edge:
 		ImageView dummy = new ImageView(ctx);
