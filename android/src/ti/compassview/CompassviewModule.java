@@ -8,6 +8,8 @@
  */
 package ti.compassview;
 
+import java.util.Map.Entry;
+
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.KrollProxy;
@@ -162,6 +164,9 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		KrollDict imageBlob = TiUIHelper.viewToImage(proxy.getProperties(), sv.getOuterView());
 		// extracting raw data from TiBlob:
 		byte[] byteArray = null;
+		for (Entry<String, Object> k : imageBlob.entrySet()) {
+			Log.d(LCAT, k.getKey());
+		}
 		if (imageBlob.containsKey("media")) {
 			byteArray = (byte[]) (imageBlob.get("media"));
 		} else
