@@ -189,6 +189,6 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		LinearLayout container = new LinearLayout(scrollViewProxy.getActivity());
 		container.setLayoutParams(lp);
 		container.addView(dummyImage);
-		tiview.getLayout().addView(dummyImage, lp);
+		// tiview.getLayout().addView(dummyImage, lp);
 	}
 }
