@@ -49,6 +49,8 @@ for ( i = 0; i < 360; i += 30) {
 }
 Compass.setCompassTracker(containerView,{
 	offset : 0 // offset to north
-	smoothy : true  // uses smoothScroll
+	smoothScroll : true  // uses smoothScroll,
+	sensorDelay : Compass.SENSOR_DELAY_FASTEST
+	
 });
 ```
