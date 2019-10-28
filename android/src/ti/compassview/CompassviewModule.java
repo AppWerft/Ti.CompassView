@@ -110,7 +110,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	public void addCompassTracker(@Kroll.argument(optional = true) Object viewproxy,
 			@Kroll.argument(optional = true) Object _opts) {
 		if (_opts != null) {
-			if (_opts instanceof KrollDict) {
+			if (_opts instanceof HashMap) {
 				KrollDict opts = (KrollDict) _opts;
 				if (opts.containsKeyAndNotNull(PROP_SMOOTHSCROLL)) {
 					smoothScroll = opts.getBoolean(PROP_SMOOTHSCROLL);
