@@ -56,7 +56,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private static SensorManager sensorManager = TiSensorHelper.getSensorManager();
 	private Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 	private int sensorDelay = SensorManager.SENSOR_DELAY_UI;
-	TiUIScrollView sv;
+	TiUIScrollView tiuiscrlollView;
 	private int contentWidth;
 	private boolean smoothScroll = true;
 	private static final int MSG_FIRST_ID = KrollModule.MSG_LAST_ID + 1;
@@ -108,11 +108,11 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		if (view == null) {
 			Log.e(LCAT, "first argument must be defined");
 		} else if (view instanceof ScrollViewProxy) {
-			sv = (TiUIScrollView) ((ScrollViewProxy) view).getOrCreateView();
+			tiuiscrlollView = (TiUIScrollView) ((ScrollViewProxy) view).getOrCreateView();
 			// getting original contentWidth (must be numeric, Ti.UI.SIZE doesn't work):
-			contentWidth = (int) sv.getProxy().getProperty(TiC.PROPERTY_CONTENT_WIDTH);
+			contentWidth = (int) tiuiscrlollView.getProxy().getProperty(TiC.PROPERTY_CONTENT_WIDTH);
 
-			ImageView dummy = getDummyImage();
+			addDummyImage();
 			// starting tracking:
 			sensorManager.registerListener(CompassviewModule.this, sensor, sensorDelay);
 			sensorManager.registerListener(CompassviewModule.this,
@@ -152,16 +152,17 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 	private void handleSetOffset(int x) {
 		// Log.d(LCAT, "scrollTo=" + x + " / " + contentWidth);
-		sv.scrollTo(x, 0, smoothScroll);
+		tiuiscrlollView.scrollTo(x, 0, smoothScroll);
 
 	}
 
-	private ImageView getDummyImage() {
-		KrollProxy proxy = sv.getProxy();
+	private void addDummyImage() {
+
+		KrollProxy proxy = tiuiscrlollView.getProxy();
 		// doubling of container width:
-		sv.getLayout().setParentContentWidth(2 * contentWidth);
+		tiuiscrlollView.getLayout().setParentContentWidth(2 * contentWidth);
 		// making screenshot:
-		KrollDict imageBlob = TiUIHelper.viewToImage(proxy.getProperties(), sv.getOuterView());
+		KrollDict imageBlob = TiUIHelper.viewToImage(proxy.getProperties(), tiuiscrlollView.getOuterView());
 		for (Entry<String, Object> set : imageBlob.entrySet()) {
 			Log.d(LCAT, set.getKey());
 		}
@@ -175,8 +176,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		ImageView dummy = new ImageView(ctx);
 		dummy.setImageBitmap(bitmap);
 		dummy.setPadding(contentWidth, 0, 0, 0);
-		sv.getLayout().addView(dummy);
-		return dummy;
+		tiuiscrlollView.getLayout().addView(dummy);
 	}
 
 }
