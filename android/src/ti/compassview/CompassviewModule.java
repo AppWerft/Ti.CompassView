@@ -56,7 +56,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private double offset = 0;
 	private static SensorManager sensorManager = TiSensorHelper.getSensorManager();
 	private Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-
+	private float scale = 1.0f;
 	ScrollViewProxy scrollViewProxy;
 	TiUIScrollView tiview;
 
@@ -120,6 +120,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 				}
 			}
 		}
+
 		if (viewproxy == null) {
 			Log.e(LCAT, "first argument must be defined");
 		} else if (viewproxy instanceof ScrollViewProxy) {
@@ -135,6 +136,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		} else {
 			Log.e(LCAT, "first argument must be a scrollView");
 		}
+		scale = contentWidth / 360 / density;
 	}
 
 	@Override
@@ -157,7 +159,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	public void onSensorChanged(SensorEvent event) {
 		float currentΦ = event.values[0];
 		currentΦ += getDeviceRotation();
-		int x = (int) (currentΦ * contentWidth / 360 / density);
+		int x = (int) (currentΦ * scale);
 		if (TiApplication.isUIThread()) {
 			handleSetOffset(x);
 		} else {
@@ -168,7 +170,6 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private void handleSetOffset(int x) {
 		Log.d(LCAT, "scrollTo=" + x + " / " + smoothScroll);
 		tiview.scrollTo(x, 0, smoothScroll);
-
 	}
 
 	private void addDummyImageAtRightEdgeOfScrollView() {
