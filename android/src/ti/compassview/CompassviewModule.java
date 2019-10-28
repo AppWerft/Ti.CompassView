@@ -109,8 +109,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		if (_opts != null) {
 			if (_opts instanceof KrollDict) {
 				KrollDict opts = (KrollDict) _opts;
-				if (opts.containsKeyAndNotNull("smoothy")) {
-					smoothScroll = opts.getBoolean("smoothy");
+				if (opts.containsKeyAndNotNull("smoothScroll")) {
+					smoothScroll = opts.getBoolean("smoothScroll");
 				}
 				if (opts.containsKeyAndNotNull("offset")) {
 					offset = opts.getInt("offset");
@@ -168,7 +168,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	}
 
 	private void handleSetOffset(int x) {
-		Log.d(LCAT, "scrollTo=" + x + " / " + smoothScroll);
+		// Log.d(LCAT, "scrollTo=" + x + " / " + smoothScroll);
 		tiview.scrollTo(x, 0, smoothScroll);
 	}
 
