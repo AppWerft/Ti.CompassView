@@ -159,11 +159,16 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private ImageView getDummyImage() {
 		KrollProxy proxy = sv.getProxy();
 		// doubling of container width:
-		int doublewidth = 2 * contentWidth;
-		sv.getLayout().setParentContentWidth(doublewidth);
-		// making screenshot and extracting raw data from TiBlob:
-		byte[] byteArray = ((TiBlob) (TiUIHelper.viewToImage(proxy.getProperties(), sv.getOuterView()).get("media")))
-				.getBytes();
+		sv.getLayout().setParentContentWidth(2 * contentWidth);
+		// making screenshot:
+		KrollDict imageBlob = TiUIHelper.viewToImage(proxy.getProperties(), sv.getOuterView());
+		for (Entry<String, Object> set : imageBlob.entrySet()) {
+			Log.d(LCAT, set.getKey());
+		}
+
+		TiBlob blob = (TiBlob) (imageBlob.get("media"));
+		// extracting raw data from TiBlob:
+		byte[] byteArray = blob.getBytes();
 		// build a bitmap:
 		Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 		// new image view for right edge:
