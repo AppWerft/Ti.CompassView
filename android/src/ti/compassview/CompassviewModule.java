@@ -190,6 +190,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		// bitmap into view:
 		dummyImage.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 		dummyImage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		dummyImage.getLayoutParams().width = contentWidth;
 		tiview.getLayout().addView(dummyImage);
 	}
 }
