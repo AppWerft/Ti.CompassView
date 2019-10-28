@@ -111,7 +111,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	public void addCompassTracker(@Kroll.argument(optional = true) Object viewproxy,
 			@Kroll.argument(optional = true) KrollDict _opts) {
 		if (_opts != null) {
-			KrollDict opts = (KrollDict) _opts;
+			KrollDict opts = _opts;
 			if (opts.containsKeyAndNotNull(PROP_SMOOTHSCROLL)) {
 				smoothScroll = opts.getBoolean(PROP_SMOOTHSCROLL);
 			}
@@ -182,8 +182,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
 				.get("media"));
 		ImageView dummy = new ImageView(ctx);
-		dummy.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 		dummy.setLeft(contentWidth);
+		dummy.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 		TiScrollViewLayout layout = tiview.getLayout();
 		layout.addView(dummy);
 	}
