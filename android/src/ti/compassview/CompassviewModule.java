@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout.LayoutParams;
 import ti.modules.titanium.ui.ScrollViewProxy;
 import ti.modules.titanium.ui.widget.TiUIScrollView;
+import ti.modules.titanium.ui.widget.TiUIScrollView.TiScrollViewLayout;
 
 @Kroll.module(name = "Compassview", id = "ti.compassview")
 public class CompassviewModule extends KrollModule implements SensorEventListener {
@@ -167,7 +168,6 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	}
 
 	private void addDummyImageAtRightEdgeOfScrollView() {
-		tiview.getLayout().setParentContentWidth(2 * contentWidth);
 		KrollDict screenshot = TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView());
 		TiBlob blob = (TiBlob) (screenshot.get("media"));
 		byte[] byteArray = blob.getBytes();
@@ -175,6 +175,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		ImageView dummy = new ImageView(ctx);
 		dummy.setImageBitmap(bitmap);
 		dummy.setPadding(contentWidth, 0, 0, 0);
-		tiview.getLayout().addView(dummy);
+		TiScrollViewLayout layout = tiview.getLayout();
+		layout.setMinimumWidth(2 * contentWidth);
+		layout.addView(dummy);
 	}
 }
