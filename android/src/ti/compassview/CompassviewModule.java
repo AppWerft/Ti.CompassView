@@ -37,6 +37,7 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import ti.modules.titanium.ui.ScrollViewProxy;
 import ti.modules.titanium.ui.widget.TiUIScrollView;
@@ -185,6 +186,10 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		dummy.setLeft(contentWidth);
 		dummy.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 		TiScrollViewLayout layout = tiview.getLayout();
-		layout.addView(dummy);
+		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		LinearLayout container = new LinearLayout(scrollViewProxy.getActivity());
+		container.setLayoutParams(lp);
+		container.addView(dummy);
+		layout.addView(container);
 	}
 }
