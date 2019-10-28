@@ -51,6 +51,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	public static final String PROP_OFFSET = "offset";
 	public static final String PROP_DURATION = "duration";
 	public static final String PROP_SMOOTHSCROLL = "smoothScroll";
+	public static final String PROP_SENSORDELAY = "sensorDelay";
 
 	public static final int TYPE_COMPASS = -1;
 	public static final int TYPE_RADAR = 1;
@@ -117,9 +118,10 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 				if (opts.containsKeyAndNotNull(PROP_OFFSET)) {
 					offset = opts.getInt(PROP_OFFSET);
 				}
-				if (opts.containsKeyAndNotNull("sensorDelay")) {
-					sensorDelay = opts.getInt("sensorDelay");
+				if (opts.containsKeyAndNotNull(PROP_SENSORDELAY)) {
+					sensorDelay = opts.getInt(PROP_SENSORDELAY);
 				}
+				Log.d(LCAT, opts.toString());
 			}
 		}
 
