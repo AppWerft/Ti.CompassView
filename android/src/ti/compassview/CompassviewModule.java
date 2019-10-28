@@ -122,8 +122,10 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 					sensorDelay = opts.getInt(PROP_SENSORDELAY);
 				}
 				Log.d(LCAT, opts.toString());
-			}
-		}
+			} else
+				Log.w(LCAT, "second param wasn't Dict");
+		} else
+			Log.w(LCAT, "second param was missing, use defaults");
 
 		if (viewproxy == null) {
 			Log.e(LCAT, "first argument must be defined");
