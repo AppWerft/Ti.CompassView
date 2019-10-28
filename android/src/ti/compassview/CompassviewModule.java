@@ -8,6 +8,7 @@
  */
 package ti.compassview;
 
+import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.appcelerator.kroll.KrollDict;
@@ -108,22 +109,20 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 	@Kroll.method
 	public void addCompassTracker(@Kroll.argument(optional = true) Object viewproxy,
-			@Kroll.argument(optional = true) Object _opts) {
+			@Kroll.argument(optional = true) KrollDict _opts) {
 		if (_opts != null) {
-			if (_opts instanceof HashMap) {
-				KrollDict opts = (KrollDict) _opts;
-				if (opts.containsKeyAndNotNull(PROP_SMOOTHSCROLL)) {
-					smoothScroll = opts.getBoolean(PROP_SMOOTHSCROLL);
-				}
-				if (opts.containsKeyAndNotNull(PROP_OFFSET)) {
-					offset = opts.getInt(PROP_OFFSET);
-				}
-				if (opts.containsKeyAndNotNull(PROP_SENSORDELAY)) {
-					sensorDelay = opts.getInt(PROP_SENSORDELAY);
-				}
-				Log.d(LCAT, opts.toString());
-			} else
-				Log.w(LCAT, "second param wasn't Dict");
+			KrollDict opts = (KrollDict) _opts;
+			if (opts.containsKeyAndNotNull(PROP_SMOOTHSCROLL)) {
+				smoothScroll = opts.getBoolean(PROP_SMOOTHSCROLL);
+			}
+			if (opts.containsKeyAndNotNull(PROP_OFFSET)) {
+				offset = opts.getInt(PROP_OFFSET);
+			}
+			if (opts.containsKeyAndNotNull(PROP_SENSORDELAY)) {
+				sensorDelay = opts.getInt(PROP_SENSORDELAY);
+			}
+			Log.d(LCAT, opts.toString());
+
 		} else
 			Log.w(LCAT, "second param was missing, use defaults");
 
