@@ -114,6 +114,9 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 				if (opts.containsKeyAndNotNull("offset")) {
 					offset = opts.getInt("offset");
 				}
+				if (opts.containsKeyAndNotNull("sensorDelay")) {
+					sensorDelay = opts.getInt("sensorDelay");
+				}
 			}
 		}
 		if (viewproxy == null) {
@@ -175,8 +178,9 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		ImageView dummy = new ImageView(ctx);
 		dummy.setImageBitmap(bitmap);
 		dummy.setPadding(contentWidth, 0, 0, 0);
+		scrollViewProxy.setProperty(TiC.PROPERTY_CONTENT_WIDTH, 2 * contentWidth);
 		TiScrollViewLayout layout = tiview.getLayout();
-		layout.setMinimumWidth(2 * contentWidth);
+		// layout.setMinimumWidth(2 * contentWidth);
 		layout.addView(dummy);
 	}
 }
