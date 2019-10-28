@@ -50,6 +50,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	public static final String PROP_TYPE = "rotationtype";
 	public static final String PROP_OFFSET = "offset";
 	public static final String PROP_DURATION = "duration";
+	public static final String PROP_SMOOTHSCROLL = "smoothScroll";
+
 	public static final int TYPE_COMPASS = -1;
 	public static final int TYPE_RADAR = 1;
 	private int currentDeviceOrientation = 0;
@@ -61,7 +63,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	TiUIScrollView tiview;
 
 	private int contentWidth;
-	private boolean smoothScroll = true;
+	private boolean smoothScroll = false;
 	private static final int MSG_FIRST_ID = KrollModule.MSG_LAST_ID + 1;
 	private static final int MSG_SET_OFFSET = MSG_FIRST_ID + 500;
 	private static Context ctx = TiApplication.getInstance().getApplicationContext();
@@ -109,11 +111,11 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		if (_opts != null) {
 			if (_opts instanceof KrollDict) {
 				KrollDict opts = (KrollDict) _opts;
-				if (opts.containsKeyAndNotNull("smoothScroll")) {
-					smoothScroll = opts.getBoolean("smoothScroll");
+				if (opts.containsKeyAndNotNull(PROP_SMOOTHSCROLL)) {
+					smoothScroll = opts.getBoolean(PROP_SMOOTHSCROLL);
 				}
-				if (opts.containsKeyAndNotNull("offset")) {
-					offset = opts.getInt("offset");
+				if (opts.containsKeyAndNotNull(PROP_OFFSET)) {
+					offset = opts.getInt(PROP_OFFSET);
 				}
 				if (opts.containsKeyAndNotNull("sensorDelay")) {
 					sensorDelay = opts.getInt("sensorDelay");
