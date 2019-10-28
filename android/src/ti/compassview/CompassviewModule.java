@@ -183,7 +183,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
 				.get("media"));
 		ImageView dummy = new ImageView(ctx);
-		// dummy.setLeft(contentWidth);
+		dummy.setLeft(contentWidth);
 		dummy.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 //		TiScrollViewLayout layout = tiview.getLayout();
 //		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
