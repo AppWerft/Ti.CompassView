@@ -67,7 +67,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private float scale = 1.0f;
 	ScrollViewProxy scrollViewProxy;
 	TiUIScrollView tiview;
-	private ImageView iv;
+
 	private int contentWidth;
 	private boolean smoothScroll = false;
 	private static final int MSG_FIRST_ID = KrollModule.MSG_LAST_ID + 1;
@@ -184,6 +184,18 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private class DummyTiView extends TiUIView {
 		public DummyTiView(final TiViewProxy proxy) {
 			super(proxy);
+
+			// making „screenshot“
+			TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
+					.get("media"));
+			ImageView iv = new ImageView(ctx);
+			// preparing for adding on right border:
+			iv.setLeft(contentWidth);
+			// bitmap into view:
+			iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
+			iv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			iv.getLayoutParams().width = contentWidth;
+			iv.getLayoutParams().height = contentWidth;
 			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			LinearLayout container = new LinearLayout(proxy.getActivity());
 
@@ -192,27 +204,11 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			setNativeView(container);
 		}
 
-		public DummyTiView(final TiViewProxy proxy, TiBlob blob) {
-			super(proxy);
-
-		}
 	}
 
 	private void addivAtRightEdgeOfScrollView() {
 		// extending the width:
 		scrollViewProxy.setProperty(TiC.PROPERTY_CONTENT_WIDTH, 2 * contentWidth);
-		// making „screenshot“
-		TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
-				.get("media"));
-		iv = new ImageView(ctx);
-		// preparing for adding on right border:
-		iv.setLeft(contentWidth);
-		// bitmap into view:
-		iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
-		iv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		iv.getLayoutParams().width = contentWidth;
-		iv.getLayoutParams().height = contentWidth;
-
 		tiview.add(new DummyTiView(scrollViewProxy));
 	}
 }
