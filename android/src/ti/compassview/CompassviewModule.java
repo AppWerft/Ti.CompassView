@@ -186,6 +186,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			super(proxy);
 			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 			LinearLayout container = new LinearLayout(proxy.getActivity());
+
 			container.setLayoutParams(lp);
 			container.addView(iv);
 			setNativeView(container);
@@ -205,9 +206,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 		iv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 		iv.getLayoutParams().width = contentWidth;
-		DummyTiView view = new DummyTiView(scrollViewProxy);
-		view.getLayoutParams().autoFillsHeight = true;
-		view.getLayoutParams().autoFillsWidth = true;
-		tiview.add(view);
+		iv.getLayoutParams().height = contentWidth;
+
+		tiview.add(new DummyTiView(scrollViewProxy));
 	}
 }
