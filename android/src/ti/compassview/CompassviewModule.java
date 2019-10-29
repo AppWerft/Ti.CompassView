@@ -191,6 +191,11 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			container.addView(iv);
 			setNativeView(container);
 		}
+
+		public DummyTiView(final TiViewProxy proxy, TiBlob blob) {
+			super(proxy);
+
+		}
 	}
 
 	private void addivAtRightEdgeOfScrollView() {
