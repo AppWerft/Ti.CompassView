@@ -32,11 +32,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.*;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Message;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.ImageView;
@@ -184,7 +187,6 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private class DummyTiView extends TiUIView {
 		public DummyTiView(final TiViewProxy proxy) {
 			super(proxy);
-
 			LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 			lp.height = 2000;
 			lp.width = 2 * contentWidth;
@@ -196,8 +198,9 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
 					.get("media"));
 			ImageView iv = new ImageView(ctx);
+			this.background = new BitmapDrawable(ctx.getResources(),
+					BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 			iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
-
 			container.addView(iv);
 			setNativeView(container);
 		}
