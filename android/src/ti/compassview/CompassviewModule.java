@@ -21,10 +21,13 @@ import org.appcelerator.kroll.common.TiMessenger;
 import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiBlob;
 import org.appcelerator.titanium.TiC;
+import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.util.TiSensorHelper;
 import org.appcelerator.titanium.util.TiUIHelper;
+import org.appcelerator.titanium.view.TiCompositeLayout;
+import org.appcelerator.titanium.view.TiCompositeLayout.LayoutArrangement;
 import org.appcelerator.titanium.view.TiUIView;
-
+import org.appcelerator.titanium.view.TiCompositeLayout;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -64,7 +67,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private float scale = 1.0f;
 	ScrollViewProxy scrollViewProxy;
 	TiUIScrollView tiview;
-
+	private ImageView iv;
 	private int contentWidth;
 	private boolean smoothScroll = false;
 	private static final int MSG_FIRST_ID = KrollModule.MSG_LAST_ID + 1;
@@ -134,7 +137,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			tiview = (TiUIScrollView) scrollViewProxy.getOrCreateView();
 			// getting original contentWidth (must be numeric, Ti.UI.SIZE doesn't work):
 			contentWidth = (int) scrollViewProxy.getProperty(TiC.PROPERTY_CONTENT_WIDTH);
-			addDummyImageAtRightEdgeOfScrollView();
+			addivAtRightEdgeOfScrollView();
 			// starting tracking:
 			sensorManager.registerListener(CompassviewModule.this, sensor, sensorDelay);
 			sensorManager.registerListener(CompassviewModule.this,
@@ -178,19 +181,33 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		tiview.scrollTo(x, 0, smoothScroll);
 	}
 
-	private void addDummyImageAtRightEdgeOfScrollView() {
+	private class DummyTiView extends TiUIView {
+		public DummyTiView(final TiViewProxy proxy) {
+			super(proxy);
+			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			LinearLayout container = new LinearLayout(proxy.getActivity());
+			container.setLayoutParams(lp);
+			container.addView(iv);
+			setNativeView(container);
+		}
+	}
+
+	private void addivAtRightEdgeOfScrollView() {
 		// extending the width:
 		scrollViewProxy.setProperty(TiC.PROPERTY_CONTENT_WIDTH, 2 * contentWidth);
 		// making „screenshot“
 		TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
 				.get("media"));
-		ImageView dummyImage = new ImageView(ctx);
+		iv = new ImageView(ctx);
 		// preparing for adding on right border:
-		dummyImage.setLeft(contentWidth);
+		iv.setLeft(contentWidth);
 		// bitmap into view:
-		dummyImage.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
-		dummyImage.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		dummyImage.getLayoutParams().width = contentWidth;
-		tiview.getLayout().addView(dummyImage);
+		iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
+		iv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		iv.getLayoutParams().width = contentWidth;
+		DummyTiView view = new DummyTiView(scrollViewProxy);
+		view.getLayoutParams().autoFillsHeight = true;
+		view.getLayoutParams().autoFillsWidth = true;
+		tiview.add(view);
 	}
 }
