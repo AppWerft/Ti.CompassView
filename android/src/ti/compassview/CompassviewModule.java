@@ -189,7 +189,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 					.get("media"));
 			ImageView iv = new ImageView(ctx);
 			// preparing for adding on right border:
-			iv.setLeft(contentWidth);
+			// iv.setLeft(contentWidth);
 
 			// bitmap into view:
 			iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
