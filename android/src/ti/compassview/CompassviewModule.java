@@ -142,7 +142,13 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			tiview = (TiUIScrollView) scrollViewProxy.getOrCreateView();
 			// getting original contentWidth (must be numeric, Ti.UI.SIZE doesn't work):
 			contentWidth = (int) scrollViewProxy.getProperty(TiC.PROPERTY_CONTENT_WIDTH);
-			addImageViewAtRightEdgeOfScrollView();
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					addImageViewAtRightEdgeOfScrollView();
+				}
+			});
+
 			// starting tracking:
 			sensorManager.registerListener(CompassviewModule.this, sensor, sensorDelay);
 			sensorManager.registerListener(CompassviewModule.this,
