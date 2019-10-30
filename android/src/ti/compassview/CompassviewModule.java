@@ -181,7 +181,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	}
 
 	private void handleSetOffset(int x) {
-		// Log.d(LCAT, "scrollTo=" + x + " / " + smoothScroll);
+
 		tiview.scrollTo(x, 0, smoothScroll);
 	}
 
@@ -191,7 +191,6 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
 			lp.width = 500;
-			lp.leftMargin = contentWidth;
 
 			LinearLayout container = new LinearLayout(ctx);
 			container.setMinimumHeight(1000);
