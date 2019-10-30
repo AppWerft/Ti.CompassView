@@ -194,7 +194,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			lp.width = 500;
 
 			RelativeLayout container = new RelativeLayout(ctx);
-			container.setMinimumHeight(600);
+			container.setMinimumHeight(60);
 			Log.d(LCAT, container.toString());
 			container.setLayoutParams(lp);
 			// making „screenshot“
@@ -211,23 +211,6 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			setNativeView(container);
 		}
 
-	}
-
-	private ImageView getDummyView() {
-		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-
-		lp.width = 500;
-
-		RelativeLayout container = new RelativeLayout(ctx);
-		// container.setMinimumHeight(60);
-		Log.d(LCAT, container.toString());
-		container.setLayoutParams(lp);
-
-		ImageView iv = new ImageView(ctx);
-		TiBlob blob = (TiBlob) (tiview.toImage().get("media"));
-		iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
-		// iv.setLayoutParams(lp);
-		return iv;
 	}
 
 	private void addImageViewAtRightEdgeOfScrollView() {
