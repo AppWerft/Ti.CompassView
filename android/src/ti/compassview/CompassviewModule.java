@@ -194,6 +194,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			lp.leftMargin = contentWidth;
 
 			LinearLayout container = new LinearLayout(ctx);
+			container.setMinimumHeight(1000);
 			Log.d(LCAT, container.toString());
 			container.setLayoutParams(lp);
 			// making „screenshot“
