@@ -215,7 +215,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			container.setBackground(new BitmapDrawable(ctx.getResources(),
 					BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length)));
 			container.addView(iv);
-			container.setBackgroundColor(Color.CYAN);
+			// container.setBackgroundColor(Color.CYAN);
 			setNativeView(container);
 		}
 
