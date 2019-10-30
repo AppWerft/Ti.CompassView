@@ -32,6 +32,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.*;
 
 import android.hardware.Sensor;
@@ -204,6 +205,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			container.setBackground(new BitmapDrawable(ctx.getResources(),
 					BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length)));
 			container.addView(iv);
+			container.setBackgroundColor(Color.CYAN);
 			setNativeView(container);
 		}
 
