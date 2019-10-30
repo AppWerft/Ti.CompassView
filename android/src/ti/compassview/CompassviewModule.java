@@ -140,7 +140,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			tiview = (TiUIScrollView) scrollViewProxy.getOrCreateView();
 			// getting original contentWidth (must be numeric, Ti.UI.SIZE doesn't work):
 			contentWidth = (int) scrollViewProxy.getProperty(TiC.PROPERTY_CONTENT_WIDTH);
-			addivAtRightEdgeOfScrollView();
+			addImageViewAtRightEdgeOfScrollView();
 			// starting tracking:
 			sensorManager.registerListener(CompassviewModule.this, sensor, sensorDelay);
 			sensorManager.registerListener(CompassviewModule.this,
@@ -188,27 +188,28 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		public DummyTiView(final TiViewProxy proxy) {
 			super(proxy);
 			LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-			lp.height = 2000;
+			lp.height = 1000;
 			lp.width = 2 * contentWidth;
 			lp.leftMargin = contentWidth;
 
 			LinearLayout container = new LinearLayout(ctx);
+			Log.d(LCAT, container.toString());
 			container.setLayoutParams(lp);
 			// making „screenshot“
 			TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
 					.get("media"));
 			ImageView iv = new ImageView(ctx);
 			iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
+			Log.d(LCAT, iv.toString());
 			container.setBackground(new BitmapDrawable(ctx.getResources(),
 					BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length)));
-
 			container.addView(iv);
 			setNativeView(container);
 		}
 
 	}
 
-	private void addivAtRightEdgeOfScrollView() {
+	private void addImageViewAtRightEdgeOfScrollView() {
 		// extending the width:
 		scrollViewProxy.setProperty(TiC.PROPERTY_CONTENT_WIDTH, 2 * contentWidth);
 		tiview.add(new DummyTiView(scrollViewProxy));
