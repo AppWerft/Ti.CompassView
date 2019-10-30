@@ -189,8 +189,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		public DummyTiView(final TiViewProxy proxy) {
 			super(proxy);
 			LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-			lp.height = 100;
-			lp.width = contentWidth;
+
+			lp.width = 500;
 			lp.leftMargin = contentWidth;
 
 			LinearLayout container = new LinearLayout(ctx);
@@ -200,6 +200,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			// making „screenshot“
 			TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
 					.get("media"));
+			Log.d(LCAT, blob.toString());
 			ImageView iv = new ImageView(ctx);
 			iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 			Log.d(LCAT, iv.toString());
