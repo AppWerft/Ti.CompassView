@@ -189,8 +189,8 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		public DummyTiView(final TiViewProxy proxy) {
 			super(proxy);
 			LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-			lp.height = 1000;
-			lp.width = 2 * contentWidth;
+			lp.height = 100;
+			lp.width = contentWidth;
 			lp.leftMargin = contentWidth;
 
 			LinearLayout container = new LinearLayout(ctx);
