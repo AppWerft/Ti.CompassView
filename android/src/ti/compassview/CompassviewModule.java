@@ -46,6 +46,7 @@ import android.view.Display;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
 import ti.modules.titanium.ui.ScrollViewProxy;
 import ti.modules.titanium.ui.widget.TiUIScrollView;
 import ti.modules.titanium.ui.widget.TiUIScrollView.TiScrollViewLayout;
@@ -192,7 +193,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 			lp.width = 500;
 
-			LinearLayout container = new LinearLayout(ctx);
+			RelativeLayout container = new RelativeLayout(ctx);
 			container.setMinimumHeight(600);
 			Log.d(LCAT, container.toString());
 			container.setLayoutParams(lp);
