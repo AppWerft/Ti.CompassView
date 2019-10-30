@@ -200,7 +200,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 			// making „screenshot“
 			TiBlob blob = (TiBlob) (TiUIHelper.viewToImage(scrollViewProxy.getProperties(), tiview.getOuterView())
 					.get("media"));
-			Log.d(LCAT, blob.toString());
+			Log.d(LCAT, "bloblength=" + blob.getBytes().length);
 			ImageView iv = new ImageView(ctx);
 			iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
 			Log.d(LCAT, iv.toString());
