@@ -213,10 +213,18 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 	}
 
+	private ImageView getDummyView() {
+		ImageView iv = new ImageView(ctx);
+		TiBlob blob = (TiBlob) (tiview.toImage().get("media"));
+		iv.setImageBitmap(BitmapFactory.decodeByteArray(blob.getBytes(), 0, blob.getBytes().length));
+
+		return iv;
+	}
+
 	private void addImageViewAtRightEdgeOfScrollView() {
 		// extending the width:
 		scrollViewProxy.setProperty(TiC.PROPERTY_CONTENT_WIDTH, 2 * contentWidth);
-		// tiview.getLayout().addView(new DummyTiView(scrollViewProxy).getNativeView());
-		tiview.add(new DummyTiView(scrollViewProxy));
+		tiview.getLayout().addView(getDummyView());
+		// tiview.add(new DummyTiView(scrollViewProxy));
 	}
 }
