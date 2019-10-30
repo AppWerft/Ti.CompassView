@@ -195,7 +195,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 
 			RelativeLayout container = new RelativeLayout(ctx);
 			container.setMinimumHeight(6);
-			Log.d(LCAT, container.toString());
+			container.setLeft(contentWidth);
 			container.setLayoutParams(lp);
 			// making „screenshot“
 			TiBlob blob = (TiBlob) (tiview.toImage().get("media"));
