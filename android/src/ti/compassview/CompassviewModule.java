@@ -216,7 +216,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 	private void addImageViewAtRightEdgeOfScrollView() {
 		// extending the width:
 		scrollViewProxy.setProperty(TiC.PROPERTY_CONTENT_WIDTH, 2 * contentWidth);
-		tiview.getLayout().addView(new DummyTiView(scrollViewProxy).getNativeView());
+		// tiview.getLayout().addView(new DummyTiView(scrollViewProxy).getNativeView());
 		tiview.add(new DummyTiView(scrollViewProxy));
 	}
 }
