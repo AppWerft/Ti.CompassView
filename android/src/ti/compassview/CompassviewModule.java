@@ -219,7 +219,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		lp.width = 500;
 
 		RelativeLayout container = new RelativeLayout(ctx);
-		container.setMinimumHeight(60);
+		// container.setMinimumHeight(60);
 		Log.d(LCAT, container.toString());
 		container.setLayoutParams(lp);
 
