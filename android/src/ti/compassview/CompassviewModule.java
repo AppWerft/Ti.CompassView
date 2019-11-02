@@ -140,6 +140,7 @@ public class CompassviewModule extends KrollModule implements SensorEventListene
 		} else if (viewproxy instanceof ScrollViewProxy) {
 			scrollViewProxy = (ScrollViewProxy) viewproxy;
 			tiview = (TiUIScrollView) scrollViewProxy.getOrCreateView();
+			// tiview.getNativeView().addOnAttachStateChangeListener(this);
 			// getting original contentWidth (must be numeric, Ti.UI.SIZE doesn't work):
 			contentWidth = (int) scrollViewProxy.getProperty(TiC.PROPERTY_CONTENT_WIDTH);
 			getActivity().runOnUiThread(new Runnable() {
